@@ -129,6 +129,98 @@ That's all it takes to CRUD data from MongoDB - Mongoose makes it dead simple so
 
 5.Explain, using relevant examples, the strategy for querying MongoDB (all CRUD operations)
 
+lets assume that we have a todo database with a collection of todo items. Each item has a task and a priority.
+In terms of JSON notation, an example item would look like:
+
+{
+
+  "_id" : { "$oid" : "4bffb75121eec88a67ff6ec8"} ,
+
+  "task" : "Write Code" ,
+
+  "priority" : "high"
+
+}
+
+Now that we have defined what we are storing in the database, lets have a look at how we connect to Mongo.
+Connection to the database
+To connect to a MongoDB database, we would use code similar to that below. In this code you can see that we are connecting to a database called todo and getting the collection called items. In MongoDB if neither of these items exist, they will be automatically created.
+
+Mongo mongo = new Mongo();
+
+DB db = mongo.getDB("todo");
+
+DBCollection items = db.getCollection("items");
+
+Creating documents
+To add a document to a collection, we use the insert() method of the collection.
+
+BasicDBObject doc1 = new BasicDBObject();
+
+doc1.put("task", "Write Code");
+
+doc1.put("priority", "high");
+
+items.insert(doc1);
+
+Retrieving documents
+To retrieve documents from a collection, we can create a query and then iterate through it with a cursor.
+
+BasicDBObject query = new BasicDBObject();
+
+query.put("priority", "highest");
+
+DBCursor cursor = items.find(query);
+
+// Print out "highest" priority items
+
+while (cursor.hasNext()) {
+
+    System.out.println(cursor.next());
+
+}
+
+
+This query will find all the objects in the collection that have a priority of highest. If we wanted to get all of the items in the collection, we would create the cursor without a query as shown below.
+
+DBCursor cursor = items.find();
+
+Updating documents
+To update an object, we first have to get the object from the collection then we save it back into the collection.
+
+BasicDBObject findTestItemQuery = new BasicDBObject();
+
+findTestItemQuery.put("task", "Test Code");
+
+DBCursor testItemsCursor = items.find(findTestItemQuery);
+
+if(testItemsCursor.hasNext()) {
+
+    DBObject testCodeItem = testItemsCursor.next();
+
+    testCodeItem.put("task", "Test and Review Code");
+
+    items.save(testCodeItem);
+
+}
+
+Deleting Documents
+Finally, to delete a document or set of documents, we use the remove method of the collection.
+
+BasicDBObject deleteQuery = new BasicDBObject();
+
+deleteQuery.put("priority", "highest");
+
+DBCursor cursor = items.find(deleteQuery);
+
+while (cursor.hasNext()) {
+
+    DBObject item = cursor.next();
+
+    items.remove(item);
+
+}
+
 6.Demonstrate, using a REST-API, how to perform all CRUD operations on a MongoDB
 
 7.Explain the benefits from using Mongoose, and provide an example involving all CRUD operations
